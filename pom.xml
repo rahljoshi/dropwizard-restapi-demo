@@ -17,7 +17,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <dropwizard.version>4.0.6</dropwizard.version>
+        <postgresql.version>42.2.19</postgresql.version>
         <mainClass>nagarro.DemoApplication</mainClass>
+
     </properties>
 
     <dependencyManagement>
@@ -54,10 +56,15 @@
             <artifactId>dropwizard-hibernate</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>mysql</groupId>-->
+<!--            <artifactId>mysql-connector-java</artifactId>-->
+<!--            <version>8.0.28</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
     </dependencies>
 
