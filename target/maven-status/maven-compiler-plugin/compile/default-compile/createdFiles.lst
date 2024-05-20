@@ -1,0 +1,10 @@
+nagarro\db\UserDAO.class
+nagarro\resources\UserResource.class
+nagarro\health\ApplicationHealthCheck.class
+nagarro\DemoApplication$1.class
+nagarro\model\Person.class
+nagarro\resources\PersonResource.class
+nagarro\DemoConfiguration.class
+nagarro\DemoApplication.class
+nagarro\core\User.class
+nagarro\health\DatabaseHealthCheck.class
