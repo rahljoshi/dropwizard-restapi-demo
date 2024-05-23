@@ -1,8 +1,9 @@
 nagarro\db\UserDAO.class
 nagarro\resources\UserResource.class
 nagarro\health\ApplicationHealthCheck.class
-nagarro\DemoApplication$1.class
+nagarro\util\PersonMapper.class
 nagarro\model\Person.class
+nagarro\db\PersonDAO.class
 nagarro\resources\PersonResource.class
 nagarro\DemoConfiguration.class
 nagarro\DemoApplication.class

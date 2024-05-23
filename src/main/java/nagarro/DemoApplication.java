@@ -3,24 +3,13 @@ package nagarro;
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.hibernate.HibernateBundle;
-import nagarro.core.User;
-import nagarro.db.UserDAO;
-import nagarro.health.ApplicationHealthCheck;
-import nagarro.health.DatabaseHealthCheck;
+import io.dropwizard.jdbi3.JdbiFactory;
+import nagarro.db.PersonDAO;
 import nagarro.resources.PersonResource;
-import nagarro.resources.UserResource;
+import nagarro.util.PersonMapper;
+import org.jdbi.v3.core.Jdbi;
 
 public class DemoApplication extends Application<DemoConfiguration> {
-
-    private final HibernateBundle<DemoConfiguration> hibernateBundle =
-            new HibernateBundle<DemoConfiguration>(User.class) {
-                @Override
-                public DataSourceFactory getDataSourceFactory(DemoConfiguration configuration) {
-                    return configuration.getDataSourceFactory();
-                }
-            };
 
     public static void main(final String[] args) throws Exception {
         new DemoApplication().run(args);
@@ -33,21 +22,14 @@ public class DemoApplication extends Application<DemoConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<DemoConfiguration> bootstrap) {
-        // TODO: application initialization
-        bootstrap.addBundle(hibernateBundle);
     }
 
     @Override
-    public void run(final DemoConfiguration configuration,
-                    final Environment environment) {
-        final UserDAO userDAO = new UserDAO(hibernateBundle.getSessionFactory());
-        environment.jersey().register(new UserResource(userDAO));
-        environment.jersey().register(new PersonResource());
-        environment
-                .healthChecks()
-                .register("application", new ApplicationHealthCheck());
-        final DatabaseHealthCheck healthCheck = new DatabaseHealthCheck(hibernateBundle.getSessionFactory());
-        environment.healthChecks().register("database", healthCheck);
+    public void run(DemoConfiguration configuration, Environment environment) {
+        final var factory = new JdbiFactory();
+        final var jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgresql");
+        jdbi.registerRowMapper(new PersonMapper());
+        final var personDAO = jdbi.onDemand(PersonDAO.class);
+        environment.jersey().register(new PersonResource(personDAO));
     }
-
 }

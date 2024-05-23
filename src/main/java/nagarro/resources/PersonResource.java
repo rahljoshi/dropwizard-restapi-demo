@@ -4,35 +4,38 @@ package nagarro.resources;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import nagarro.db.PersonDAO;
 import nagarro.model.Person;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Path("/persons")
 @Produces(MediaType.APPLICATION_JSON)
 public class PersonResource {
-    private final Map<Integer, Person> persons = new HashMap<>();
+    private final PersonDAO personDAO;
+
+    public PersonResource(PersonDAO personDAO) {
+        this.personDAO = personDAO;
+        personDAO.createTable();
+    }
 
     @GET
-    public Response getAllPersons() {
-        return Response.ok(persons.values()).build();
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Person> getAllPersons() {
+        return personDAO.getAllPersons();
     }
 
     @GET
     @Path("/{id}")
-    public Response getPerson(@PathParam("id") int id) {
-        final var person = persons.get(id);
-        if (person == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(person).build();
+    public Person getPersonById(@PathParam("id") int id) {
+        return personDAO.getPersonById(id);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createPerson(Person person) {
-        persons.put(person.getId(), person);
+        int newId = personDAO.insertPerson(person.getName(), person.getAge());
+        person.setId(newId);
         return Response.status(Response.Status.CREATED).entity(person).build();
     }
 
@@ -40,20 +43,14 @@ public class PersonResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updatePerson(@PathParam("id") int id, Person person) {
-        if (!persons.containsKey(id)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        persons.put(id, person);
-        return Response.ok(person).build();
+        personDAO.updatePerson(id, person.getName(), person.getAge());
+        return Response.ok().build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response deletePerson(@PathParam("id") int id) {
-        Person person = persons.remove(id);
-        if (person == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        personDAO.deletePerson(id);
         return Response.noContent().build();
     }
 }

@@ -4,6 +4,7 @@ import io.dropwizard.core.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.db.DataSourceFactory;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.*;
 import jakarta.validation.constraints.*;
 
@@ -22,4 +23,5 @@ public class DemoConfiguration extends Configuration {
     public void setDataSourceFactory(DataSourceFactory database) {
         this.database = database;
     }
+
 }
