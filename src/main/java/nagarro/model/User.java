@@ -1,4 +1,4 @@
-package nagarro.core;
+package nagarro.model;
 
 import jakarta.persistence.*;
 

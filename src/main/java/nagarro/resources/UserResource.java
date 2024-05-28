@@ -7,7 +7,7 @@ import io.dropwizard.hibernate.UnitOfWork;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import nagarro.core.User;
+import nagarro.model.User;
 import nagarro.db.UserDAO;
 
 @Path("/users")

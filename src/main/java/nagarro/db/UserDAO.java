@@ -1,7 +1,7 @@
 package nagarro.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
-import nagarro.core.User;
+import nagarro.model.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
