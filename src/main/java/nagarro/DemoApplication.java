@@ -4,10 +4,10 @@ import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
 import io.dropwizard.jdbi3.JdbiFactory;
-import nagarro.db.PersonDAO;
+import nagarro.dao.PersonDAO;
 import nagarro.resources.PersonResource;
-import nagarro.util.PersonMapper;
-import org.jdbi.v3.core.Jdbi;
+import nagarro.dao.mapper.PersonMapper;
+import nagarro.service.impl.PersonServiceImpl;
 
 public class DemoApplication extends Application<DemoConfiguration> {
 
@@ -30,6 +30,9 @@ public class DemoApplication extends Application<DemoConfiguration> {
         final var jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgresql");
         jdbi.registerRowMapper(new PersonMapper());
         final var personDAO = jdbi.onDemand(PersonDAO.class);
-        environment.jersey().register(new PersonResource(personDAO));
+        personDAO.createTable();
+        final var personService = new PersonServiceImpl(personDAO);
+        final var personResource = new PersonResource(personService);
+        environment.jersey().register(personResource);
     }
 }

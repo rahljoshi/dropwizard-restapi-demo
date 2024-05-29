@@ -1,11 +1,11 @@
-nagarro\db\UserDAO.class
-nagarro\resources\UserResource.class
+nagarro\dao\mapper\PersonMapper.class
 nagarro\health\ApplicationHealthCheck.class
-nagarro\util\PersonMapper.class
-nagarro\model\Person.class
-nagarro\db\PersonDAO.class
+nagarro\dto\PersonDTO.class
+nagarro\dao\PersonDAO.class
+nagarro\service\PersonService.class
 nagarro\resources\PersonResource.class
 nagarro\DemoConfiguration.class
 nagarro\DemoApplication.class
-nagarro\core\User.class
+nagarro\entity\Person.class
+nagarro\service\impl\PersonServiceImpl.class
 nagarro\health\DatabaseHealthCheck.class

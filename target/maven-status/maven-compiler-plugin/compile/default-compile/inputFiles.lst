@@ -1,11 +1,11 @@
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\core\User.java
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\db\PersonDAO.java
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\db\UserDAO.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\dao\mapper\PersonMapper.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\dao\PersonDAO.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\DemoApplication.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\DemoConfiguration.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\dto\PersonDTO.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\entity\Person.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\health\ApplicationHealthCheck.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\health\DatabaseHealthCheck.java
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\model\Person.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\resources\PersonResource.java
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\resources\UserResource.java
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\util\PersonMapper.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\service\impl\PersonServiceImpl.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\service\PersonService.java

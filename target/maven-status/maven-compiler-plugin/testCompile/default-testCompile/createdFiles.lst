@@ -1,0 +1,4 @@
+nagarro\service\PersonServiceTest.class
+nagarro\core\DemoTesting.class
+nagarro\dao\PersonDAOTest.class
+nagarro\resources\PersonResourceTest.class
