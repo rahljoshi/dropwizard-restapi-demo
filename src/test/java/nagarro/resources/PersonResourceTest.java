@@ -53,7 +53,7 @@ class PersonResourceTest {
 
         // Then
         assertThat(response.getStatus()).isEqualTo(STATUS_OK);
-        List<PersonDTO> responsePersons = (List<PersonDTO>) response.getEntity();
+        final var responsePersons = (List<PersonDTO>) response.getEntity();
         assertThat(responsePersons).hasSize(2);
         assertThat(responsePersons.get(0).getName()).isEqualTo(PERSON_NAME_RAHUL);
         assertThat(responsePersons.get(1).getAge()).isEqualTo(PERSON_AGE_25);
