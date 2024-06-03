@@ -1,32 +1,31 @@
 package nagarro.dao;
 
 import nagarro.entity.Person;
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.jdbi.v3.testing.JdbiRule.*;
-import static org.junit.jupiter.api.Assertions.*;
+class PersonDAOTest {
 
-public class PersonDAOTest {
+    private static final String PERSON_NAME_RAHUL = "Rahul";
+    private static final int PERSON_AGE_21 = 21;
+    private static final int PERSON_AGE_25 = 25;
 
-    private Jdbi jdbi;
     private PersonDAO personDAO;
 
     @BeforeEach
     public void setUp() {
-        jdbi = Jdbi.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+        final var jdbi = Jdbi.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
         jdbi.installPlugin(new SqlObjectPlugin());
         jdbi.installPlugin(new H2DatabasePlugin());
 
-        try (Handle handle = jdbi.open()) {
+        try (var handle = jdbi.open()) {
             handle.execute("DROP TABLE IF EXISTS person");
             handle.execute("CREATE TABLE person (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100), age INTEGER)");
         }
@@ -35,49 +34,70 @@ public class PersonDAOTest {
 
 
     @Test
-    public void testInsertAndRetrievePerson() {
-        Person person = new Person(0, "Rahul", 21);
-        int id = personDAO.insertPerson(person);
+    @DisplayName("Create person and retrieve successfully")
+    void testInsertAndRetrievePerson() {
+        //given
+        final var person = new Person(0, PERSON_NAME_RAHUL, PERSON_AGE_21);
+
+        //when
+        final var id = personDAO.createPerson(person);
+
+        //then
         assertTrue(id > 0);
 
-        Person retrievedPerson = personDAO.getPersonById(id);
+        // when
+        final var retrievedPerson = personDAO.getPersonById(id);
 
-        assertNotNull(retrievedPerson);
-        assertEquals("Rahul", retrievedPerson.getName());
-        assertEquals(21, retrievedPerson.getAge());
+        //then
+        assertFalse(retrievedPerson.isEmpty());
+        assertThat(retrievedPerson.get().getName()).isEqualTo(PERSON_NAME_RAHUL);
+        assertThat(retrievedPerson.get().getAge()).isEqualTo(PERSON_AGE_21);
     }
 
     @Test
-    public void testGetAllPersons() {
-        personDAO.insertPerson(new Person(0, "Rahul", 21));
-        personDAO.insertPerson(new Person(0, "Bobby", 30));
+    @DisplayName("Get all persons return coorrects data")
+    void testGetAllPersons() {
+        // given
+        personDAO.createPerson(new Person(0, PERSON_NAME_RAHUL, PERSON_AGE_21));
+        personDAO.createPerson(new Person(0, PERSON_NAME_RAHUL, PERSON_AGE_25));
 
-        List<Person> persons = personDAO.getAllPersons();
+        // when
+        final var persons = personDAO.getAllPersons();
+
+        // Then
         assertEquals(2, persons.size());
     }
 
     @Test
-    public void testUpdatePerson() {
-        Person person = new Person(0, "Rahul", 21);
-        int id = personDAO.insertPerson(person);
+    @DisplayName("Update Person Successfully")
+    void testUpdatePerson() {
+        // Given
+        final var person = new Person(0, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        final var id = personDAO.createPerson(person);
+        final var updatedPerson = new Person(id, "Rahul Updated", 31);
 
-        Person updatedPerson = new Person(id, "Rahul Updated", 31);
+        // When
         personDAO.updatePerson(updatedPerson);
 
-        Person retrievedPerson = personDAO.getPersonById(id);
-        assertNotNull(retrievedPerson);
-        assertEquals("Rahul Updated", retrievedPerson.getName());
-        assertEquals(31, retrievedPerson.getAge());
+        // Then
+        final var retrievedPerson = personDAO.getPersonById(id);
+        assertFalse(retrievedPerson.isEmpty());
+        assertEquals("Rahul Updated", retrievedPerson.get().getName());
+        assertEquals(31, retrievedPerson.get().getAge());
     }
 
     @Test
-    public void testDeletePerson() {
-        Person person = new Person(0, "Rahul", 21);
-        int id = personDAO.insertPerson(person);
+    @DisplayName("Delete person successfully")
+    void testDeletePerson() {
+        // Given
+        final var person = new Person(0, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        final var id = personDAO.createPerson(person);
 
+        // When
         personDAO.deletePerson(id);
 
-        Person retrievedPerson = personDAO.getPersonById(id);
-        assertNull(retrievedPerson);
+        // Then
+        final var retrievedPerson = personDAO.getPersonById(id);
+        assertTrue(retrievedPerson.isEmpty());
     }
 }

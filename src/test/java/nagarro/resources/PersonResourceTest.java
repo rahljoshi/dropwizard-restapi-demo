@@ -2,26 +2,35 @@ package nagarro.resources;
 
 import jakarta.ws.rs.core.Response;
 import nagarro.dto.PersonDTO;
+import nagarro.service.PersonService;
 import nagarro.service.impl.PersonServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class PersonResourceTest {
-    @Mock
-    private PersonServiceImpl personService;
+class PersonResourceTest {
+
+    private static final String PERSON_NAME_RAHUL = "Rahul";
+    private static final String PERSON_NAME_BOBBY = "Bobby";
+    private static final int PERSON_AGE_21 = 21;
+    private static final int PERSON_AGE_25 = 25;
+    private static final int STATUS_OK = 200;
+    private static final int STATUS_CREATED = 201;
+    private static final int STATUS_NO_CONTENT = 204;
+    private static final int INVALID_ID = -1;
+    private static final int STATUS_NOT_FOUND = 404;
+
+    private final PersonService personService = mock(PersonServiceImpl.class);
 
     @InjectMocks
     private PersonResource personResource;
@@ -32,66 +41,147 @@ public class PersonResourceTest {
     }
 
     @Test
-    public void testGetAllPersons() {
-        PersonDTO person1 = new PersonDTO(1, "Rahul", 21);
-        PersonDTO person2 = new PersonDTO(2, "Bobby", 25);
+    @DisplayName("Get all persons returns correct data")
+    void testGetAllPersons() {
+        // Given
+        final var person1 = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        final var person2 = new PersonDTO(2, PERSON_NAME_BOBBY, PERSON_AGE_25);
         when(personService.getAllPersons()).thenReturn(Arrays.asList(person1, person2));
 
-//        Response response = personResource.getAllPersons();
-//        List<PersonDTO> persons =response.readEntity(new GenericType<List<PersonDTO>>() {});
+        // When
+        final var response = personResource.getAllPersons();
 
-        List<PersonDTO> persons = personService.getAllPersons();
+        // Then
+        assertThat(response.getStatus()).isEqualTo(STATUS_OK);
+        List<PersonDTO> responsePersons = (List<PersonDTO>) response.getEntity();
+        assertThat(responsePersons).hasSize(2);
+        assertThat(responsePersons.get(0).getName()).isEqualTo(PERSON_NAME_RAHUL);
+        assertThat(responsePersons.get(1).getAge()).isEqualTo(PERSON_AGE_25);
 
-        assertEquals(2, persons.size());
-        assertEquals("Rahul", persons.get(0).getName());
-        assertEquals(25, persons.get(1).getAge());
-        Mockito.verify(personService, times(1)).getAllPersons();
+        verify(personService).getAllPersons();
     }
 
     @Test
-    public void testGetPersonById() {
-        PersonDTO person = new PersonDTO(1, "Rahul", 21);
+    @DisplayName("Get person by ID returns correct person")
+    void testGetPersonById() {
+        // Given
+        final var person = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
         when(personService.getPersonById(1)).thenReturn(person);
 
-        Response response = personResource.getPersonById(1);
-        PersonDTO retrievedPerson = (PersonDTO) response.getEntity();
+        // When
+        final var response = personResource.getPersonById(1);
 
-        assertEquals(200, response.getStatus());
-        assertNotNull(retrievedPerson);
-        assertEquals("Rahul", retrievedPerson.getName());
-        assertEquals(21, retrievedPerson.getAge());
-        Mockito.verify(personService, times(1)).getPersonById(1);
+        // Then
+        assertThat(response.getStatus()).isEqualTo(STATUS_OK);
+        final var retrievedPerson = (PersonDTO) response.getEntity();
+        assertThat(retrievedPerson).isNotNull();
+        assertThat(retrievedPerson.getName()).isEqualTo(PERSON_NAME_RAHUL);
+        assertThat(retrievedPerson.getAge()).isEqualTo(PERSON_AGE_21);
+
+        verify(personService).getPersonById(1);
     }
 
     @Test
-    public void testCreatePerson() {
-        PersonDTO personDTO = new PersonDTO(0, "Rahul", 21);
-        when(personService.insertPerson(any(PersonDTO.class))).thenReturn(personDTO);
+    @DisplayName("Create person successfully")
+    void testCreatePerson() {
+        // Given
+        final var personDTO = new PersonDTO(0, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        when(personService.createPerson(any(PersonDTO.class))).thenReturn(personDTO);
 
-        Response response = personResource.createPerson(personDTO);
-        PersonDTO createdPerson = (PersonDTO) response.getEntity();
+        // When
+        final var response = personResource.createPerson(personDTO);
 
-        assertEquals(201, response.getStatus());
-        assertNotNull(createdPerson);
-        assertEquals("Rahul", createdPerson.getName());
-        assertEquals(21, createdPerson.getAge());
-        Mockito.verify(personService, times(1)).insertPerson(any(PersonDTO.class));
+        // Then
+        assertThat(response.getStatus()).isEqualTo(STATUS_CREATED);
+        final var createdPerson = (PersonDTO) response.getEntity();
+        assertThat(createdPerson).isNotNull();
+        assertThat(createdPerson.getName()).isEqualTo(PERSON_NAME_RAHUL);
+        assertThat(createdPerson.getAge()).isEqualTo(PERSON_AGE_21);
+
+        verify(personService).createPerson(any(PersonDTO.class));
     }
 
     @Test
-    public void testUpdatePerson() {
-        PersonDTO personDTO = new PersonDTO(1, "Rahul", 21);
+    @DisplayName("Update person successfully")
+    void testUpdatePerson() {
+        // given
+        final var personDTO = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
 
-        Response response = personResource.updatePerson(1,personDTO);
-        assertEquals(200, response.getStatus());
-        Mockito.verify(personService, times(1)).updatePerson(any(PersonDTO.class));
+        //when
+        final var response = personResource.updatePerson(1, personDTO);
+
+        //then
+        assertThat(response.getStatus()).isEqualTo(STATUS_OK);
+        verify(personService).updatePerson(1, personDTO);
     }
 
     @Test
-    public void testDeletePerson() {
-        Response response = personResource.deletePerson(1);
-        assertEquals(204, response.getStatus());
-        Mockito.verify(personService, times(1)).deletePerson(1);
+    @DisplayName("Delete person successfully")
+    void testDeletePerson() {
+        // when
+        final var response = personResource.deletePerson(1);
+
+        //then
+        assertThat(response.getStatus()).isEqualTo(STATUS_NO_CONTENT);
+        verify(personService).deletePerson(1);
+    }
+
+    /*
+        Negative test cases
+     */
+
+    @Test
+    @DisplayName("Get person by invalid ID returns not found")
+    void testGetPersonByInvalidId() {
+        // Given
+        when(personService.getPersonById(INVALID_ID)).thenReturn(null);
+
+        // When
+        final Response response = personResource.getPersonById(INVALID_ID);
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(STATUS_NOT_FOUND);
+        verify(personService).getPersonById(INVALID_ID);
+    }
+
+    @Test
+    @DisplayName("Create person with null data throws exception")
+    void testCreatePersonWithNullData() {
+        // Given
+        when(personService.createPerson(null)).thenThrow(new IllegalArgumentException("Person data cannot be null"));
+
+        // When
+        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> personResource.createPerson(null));
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("Person data cannot be null");
+    }
+
+    @Test
+    @DisplayName("Update person with invalid ID returns not found")
+    void testUpdatePersonWithInvalidId() {
+        // Given
+        final var personDTO = new PersonDTO(INVALID_ID, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        doThrow(new IllegalArgumentException("Invalid person ID")).when(personService).updatePerson(INVALID_ID, personDTO);
+
+        // When
+        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> personResource.updatePerson(INVALID_ID, personDTO));
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("Invalid person ID");
+    }
+
+    @Test
+    @DisplayName("Delete person with invalid ID returns not found")
+    void testDeletePersonWithInvalidId() {
+        // Given
+        doThrow(new IllegalArgumentException("Invalid person ID")).when(personService).deletePerson(INVALID_ID);
+
+        // When
+        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> personResource.deletePerson(INVALID_ID));
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("Invalid person ID");
     }
 }
 

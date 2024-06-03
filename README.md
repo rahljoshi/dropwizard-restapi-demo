@@ -13,6 +13,7 @@ Health Check
 To see your applications health enter url `http://localhost:8081/healthcheck`
 
 ## EndPoints
-`http://localhost:8080/persons` 
+
+`http://localhost:8080/persons`
 `http://localhost:8080/users`
 

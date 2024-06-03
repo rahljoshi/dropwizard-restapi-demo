@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface PersonService {
 
-    PersonDTO insertPerson(PersonDTO personDTO);
+    PersonDTO createPerson(final PersonDTO personDTO);
 
     List<PersonDTO> getAllPersons();
 
-    PersonDTO getPersonById(int id);
+    PersonDTO getPersonById(final int id);
 
-    void updatePerson(PersonDTO personDTO);
+    void updatePerson(final int id, final PersonDTO personDTO);
 
-    void deletePerson(int id);
+    void deletePerson(final int id);
 }

@@ -18,37 +18,36 @@ public class PersonResource {
     }
 
     @GET
-    public Response getAllPersons() {
+    public final Response getAllPersons() {
         return Response.ok(personService.getAllPersons()).build();
     }
 
     @GET
     @Path("/{id}")
-    public Response getPersonById(@PathParam("id") int id) {
-        final var personDTO = personService.getPersonById(id);
-        if (personDTO == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public final Response getPersonById(@PathParam("id") final int id) {
+        var person = personService.getPersonById(id);
+        if (person == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Person not found").build();
         }
-        return Response.ok(personDTO).build();
+        return Response.ok(person).build();
     }
 
     @POST
-    public Response createPerson(PersonDTO personDTO) {
-        final var createdPerson = personService.insertPerson(personDTO);
+    public final Response createPerson(final PersonDTO personDTO) {
+        final var createdPerson = personService.createPerson(personDTO);
         return Response.status(Response.Status.CREATED).entity(createdPerson).build();
     }
 
     @PUT
     @Path("/{id}")
-    public Response updatePerson(@PathParam("id") int id,PersonDTO personDTO) {
-        personDTO.setId(id);
-        personService.updatePerson(personDTO);
+    public final Response updatePerson(@PathParam("id") final int id, final PersonDTO personDTO) {
+        personService.updatePerson(id, personDTO);
         return Response.ok().build();
     }
 
     @DELETE
     @Path("/{id}")
-    public Response deletePerson(@PathParam("id") int id) {
+    public final Response deletePerson(@PathParam("id") final int id) {
         personService.deletePerson(id);
         return Response.noContent().build();
     }
