@@ -94,7 +94,7 @@ class PersonServiceTest {
         assertEquals(PERSON_NAME, createdPerson.getName());
         assertEquals(PERSON_AGE, createdPerson.getAge());
 
-        Person capturedPerson = personCaptor.getValue();
+        final var capturedPerson = personCaptor.getValue();
         assertEquals(expectedPerson.getName(), capturedPerson.getName());
         assertEquals(expectedPerson.getAge(), capturedPerson.getAge());
     }

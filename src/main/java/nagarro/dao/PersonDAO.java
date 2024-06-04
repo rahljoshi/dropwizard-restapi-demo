@@ -3,7 +3,6 @@ package nagarro.dao;
 import nagarro.dao.mapper.PersonMapper;
 import nagarro.entity.Person;
 import nagarro.exception.DatabaseOperationException;
-import nagarro.exception.PersonCreationException;
 import nagarro.exception.PersonNotFoundException;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -22,7 +21,7 @@ public interface PersonDAO {
 
     @SqlUpdate("INSERT INTO person (name, age) VALUES (:name, :age)")
     @GetGeneratedKeys
-    int createPerson(@BindBean Person person) throws PersonCreationException;
+    int createPerson(@BindBean Person person);
 
     @SqlQuery("SELECT * FROM person")
     List<Person> getAllPersons();

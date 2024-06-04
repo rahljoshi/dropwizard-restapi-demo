@@ -199,6 +199,7 @@ class PersonResourceTest {
     void testUpdatePersonWithNullData() {
         // Given
         doThrow(new ConstraintViolationException("Person data for update cannot be null", Set.of())).when(personService).updatePerson(eq(1), any());
+
         // When
         final var response = client().target(getBaseURL()).path("/persons/1").request().put(Entity.json(new PersonDTO()));
 

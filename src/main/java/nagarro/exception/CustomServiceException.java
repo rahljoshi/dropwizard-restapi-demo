@@ -7,7 +7,7 @@ import lombok.Getter;
 public class CustomServiceException extends RuntimeException {
     private final Response.Status status;
 
-    public CustomServiceException(Response.Status status, String message) {
+    public CustomServiceException(final Response.Status status, final String message) {
         super(message);
         this.status = status;
     }

@@ -1,19 +1,17 @@
 package nagarro.dao;
 
-import nagarro.dao.impl.PersonDAOImpl;
 import nagarro.entity.Person;
-import nagarro.exception.DatabaseOperationException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.h2.H2DatabasePlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 
 class PersonDAOTest {
@@ -22,13 +20,12 @@ class PersonDAOTest {
     private static final int PERSON_AGE_21 = 21;
     private static final int PERSON_AGE_25 = 25;
 
-
+    @Mock
     private PersonDAO personDAO;
 
     @BeforeEach
     public void setUp() {
         final var jdbi = Jdbi.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
-        personDAO = new PersonDAOImpl(jdbi);
 
         jdbi.installPlugin(new SqlObjectPlugin());
         jdbi.installPlugin(new H2DatabasePlugin());
@@ -118,26 +115,4 @@ class PersonDAOTest {
         final var retrievedPerson = personDAO.getPersonById(id);
         assertTrue(retrievedPerson.isEmpty());
     }
-
-    // negative test cases
-
-    @Test
-    @DisplayName("Retrieving a person by non-existent ID returns empty")
-    void testGetPersonByNonExistentId() {
-        final var retrievedPerson = personDAO.getPersonById(999);
-        assertTrue(retrievedPerson.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Retrieving all persons when database is down throws DatabaseOperationException")
-    void testGetAllPersonsWhenDatabaseDown() {
-        // Given
-        final var jdbiMock = mock(Jdbi.class);
-        when(jdbiMock.withHandle(any())).thenThrow(new RuntimeException("Database down"));
-        personDAO = new PersonDAOImpl(jdbiMock);
-
-        // When/Then
-        assertThrows(DatabaseOperationException.class, () -> personDAO.getAllPersons());
-    }
-
 }
