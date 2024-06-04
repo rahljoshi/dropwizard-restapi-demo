@@ -13,9 +13,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,7 +48,7 @@ class PersonServiceTest {
         // Given
         final var person1 = new Person(PERSON_ID, PERSON_NAME, PERSON_AGE);
         final var person2 = new Person(2, "Bobby", 25);
-        when(personDAO.getAllPersons()).thenReturn(Arrays.asList(person1, person2));
+        when(personDAO.getAllPersons()).thenReturn(asList(person1, person2));
 
         // When
         final var persons = personService.getAllPersons();
@@ -95,7 +95,6 @@ class PersonServiceTest {
         assertEquals(PERSON_NAME, createdPerson.getName());
         assertEquals(PERSON_AGE, createdPerson.getAge());
 
-        // Compare captured person fields directly
         Person capturedPerson = personCaptor.getValue();
         assertEquals(expectedPerson.getName(), capturedPerson.getName());
         assertEquals(expectedPerson.getAge(), capturedPerson.getAge());
@@ -181,5 +180,23 @@ class PersonServiceTest {
     void testDeletePersonWithInvalidId() {
         // when & then
         assertThrows(PersonNotFoundException.class, () -> personService.deletePerson(INVALID_ID));
+    }
+
+    @Test
+    @DisplayName("Delete person not present in database")
+    void testDeletePersonNotPresent() {
+        // Given
+        final var idToDelete = 1;
+        when(personDAO.getPersonById(idToDelete)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(PersonNotFoundException.class, () -> personService.deletePerson(idToDelete));
+    }
+
+    @Test
+    @DisplayName("Create person with null data")
+    void testCreatePersonWithNullData() {
+        // When & Then
+        assertThrows(NullPointerException.class, () -> personService.createPerson(null));
     }
 }

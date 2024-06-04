@@ -57,10 +57,10 @@ public class PersonResource {
             return status(OK).build();
         } catch (PersonNotFoundException e) {
             return status(NOT_FOUND).entity(new ErrorMessage(e.getMessage())).build();
+        } catch (CustomServiceException e) {
+            return status(e.getStatus()).entity(new ErrorMessage(e.getMessage())).build();
         } catch (DatabaseOperationException e) {
-            return status(INTERNAL_SERVER_ERROR)
-                    .entity(new ErrorMessage("An unexpected database error occurred while updating the person."))
-                    .build();
+            return status(INTERNAL_SERVER_ERROR).entity(new ErrorMessage("An unexpected database error occurred while updating the person.")).build();
         }
     }
 
@@ -73,9 +73,7 @@ public class PersonResource {
         } catch (PersonNotFoundException e) {
             return status(NOT_FOUND).entity(new ErrorMessage(e.getMessage())).build();
         } catch (DatabaseOperationException e) {
-            return status(INTERNAL_SERVER_ERROR)
-                    .entity(new ErrorMessage("An unexpected database error occurred while deleting the person."))
-                    .build();
+            return status(INTERNAL_SERVER_ERROR).entity(new ErrorMessage("An unexpected database error occurred while deleting the person.")).build();
         }
     }
 
@@ -88,9 +86,7 @@ public class PersonResource {
         } catch (PersonNotFoundException e) {
             return status(NOT_FOUND).entity(new ErrorMessage(e.getMessage())).build();
         } catch (DatabaseOperationException e) {
-            return status(INTERNAL_SERVER_ERROR)
-                    .entity(new ErrorMessage("An unexpected database error occurred while retrieving the person."))
-                    .build();
+            return status(INTERNAL_SERVER_ERROR).entity(new ErrorMessage("An unexpected database error occurred while retrieving the person.")).build();
         }
     }
 }

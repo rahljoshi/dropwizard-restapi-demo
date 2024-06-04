@@ -30,7 +30,7 @@ public class PersonServiceImpl implements PersonService {
             person.setId(generatedId);
             return convertPersonToPersonDTO(person);
         } catch (DatabaseOperationException e) {
-            throw e;
+            throw new DatabaseOperationException("Error while creating the person", e);
         }
     }
 
@@ -39,7 +39,7 @@ public class PersonServiceImpl implements PersonService {
         try {
             return personDAO.getAllPersons().stream().map(this::convertPersonToPersonDTO).collect(toList());
         } catch (DatabaseOperationException e) {
-            throw e;
+            throw new DatabaseOperationException("Error while retrieving the list", e);
         }
     }
 
@@ -63,7 +63,7 @@ public class PersonServiceImpl implements PersonService {
                 throw new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, id));
             }
         } catch (DatabaseOperationException e) {
-            throw e;
+            throw new DatabaseOperationException("Error while updating person", e);
         }
     }
 
@@ -77,7 +77,7 @@ public class PersonServiceImpl implements PersonService {
                 throw new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, id));
             }
         } catch (DatabaseOperationException e) {
-            throw e;
+            throw new DatabaseOperationException("Error while deleting person", e);
         }
     }
 

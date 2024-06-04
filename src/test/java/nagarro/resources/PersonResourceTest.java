@@ -106,10 +106,10 @@ class PersonResourceTest {
     @DisplayName("Update person successfully")
     void testUpdatePerson() throws PersonNotFoundException {
         // Given
-        final var personDTO = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        final var personDTO = new PersonDTO(2, PERSON_NAME_RAHUL, PERSON_AGE_21);
 
         // When
-        final var response = client().target(getBaseURL()).path("/persons/1").request().put(Entity.json(personDTO));
+        final var response = client().target(getBaseURL()).path("/persons/2").request().put(Entity.json(personDTO));
 
         // Then
         assertThat(response.getStatus()).isEqualTo(OK_200);
@@ -128,6 +128,7 @@ class PersonResourceTest {
     /**
      * Negative test cases
      */
+
 
     @Test
     @DisplayName("Get person by invalid ID returns not found")
@@ -180,6 +181,19 @@ class PersonResourceTest {
 
         // Then
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND_404);
+    }
+
+    @Test
+    @DisplayName("Update person with null data throws bad request")
+    void testUpdatePersonWithNullData() {
+        // Given
+        doThrow(new CustomServiceException(BAD_REQUEST, "Person data for update cannot be null")).when(personService).updatePerson(eq(1), any());
+
+        // When
+        final var response = client().target(getBaseURL()).path("/persons/1").request().put(Entity.json(new PersonDTO()));
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST_400);
     }
 
 }

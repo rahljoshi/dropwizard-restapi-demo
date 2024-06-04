@@ -39,6 +39,16 @@ class PersonDAOTest {
         personDAO = jdbi.onDemand(PersonDAO.class);
     }
 
+    @Test
+    @DisplayName("Create table successfully")
+    void testCreateTable() {
+        // When
+        personDAO.createTable();
+
+        // Then
+        assertTrue(true);
+    }
+
 
     @Test
     @DisplayName("Create person and retrieve successfully")
@@ -128,5 +138,4 @@ class PersonDAOTest {
         // When/Then
         assertThrows(DatabaseOperationException.class, () -> personDAO.getAllPersons());
     }
-
 }

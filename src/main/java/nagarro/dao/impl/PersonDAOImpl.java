@@ -15,6 +15,8 @@ import java.util.Optional;
 
 public class PersonDAOImpl implements PersonDAO {
 
+    private static final String PERSON_NOT_FOUND_MESSAGE = "Person with id %d not found";
+
     private final Jdbi jdbi;
 
     public PersonDAOImpl(final Jdbi jdbi) {
@@ -56,7 +58,7 @@ public class PersonDAOImpl implements PersonDAO {
         try {
             return jdbi.withHandle(handle -> handle.createQuery("SELECT * FROM person WHERE id = :id").bind("id", id).map(new PersonMapper()).findFirst());
         } catch (UnableToExecuteStatementException | UnableToCreateStatementException e) {
-            throw new PersonNotFoundException("Person not found with id: " + id);
+            throw new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, id));
         }
     }
 
@@ -65,7 +67,7 @@ public class PersonDAOImpl implements PersonDAO {
         try {
             final var retrievedPerson = getPersonById(person.getId());
             if (retrievedPerson.isEmpty()) {
-                throw new PersonNotFoundException("Person not found with id: " + person.getId());
+                throw new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, person.getId()));
             }
             jdbi.useHandle(handle -> handle.createUpdate("UPDATE person SET name = :name, age = :age WHERE id = :id").bindBean(person).execute());
 
@@ -79,7 +81,7 @@ public class PersonDAOImpl implements PersonDAO {
         try {
             final int personCount = jdbi.withHandle(handle -> handle.createQuery("SELECT COUNT(*) FROM person WHERE id = :id").bind("id", id).mapTo(Integer.class).one());
             if (personCount == 0) {
-                throw new PersonNotFoundException("Person not found with id: " + id);
+                throw new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, id));
             }
             jdbi.useHandle(handle -> handle.createUpdate("DELETE FROM person WHERE id = :id").bind("id", id).execute());
         } catch (RuntimeException e) {
