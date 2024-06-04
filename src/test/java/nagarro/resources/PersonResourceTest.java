@@ -1,43 +1,49 @@
 package nagarro.resources;
 
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
+import io.dropwizard.testing.junit5.ResourceExtension;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import nagarro.dto.PersonDTO;
+import nagarro.exception.CustomServiceException;
+import nagarro.exception.PersonNotFoundException;
 import nagarro.service.PersonService;
-import nagarro.service.impl.PersonServiceImpl;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.Arrays;
 import java.util.List;
 
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.jetty.http.HttpStatus.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(DropwizardExtensionsSupport.class)
 class PersonResourceTest {
 
     private static final String PERSON_NAME_RAHUL = "Rahul";
     private static final String PERSON_NAME_BOBBY = "Bobby";
     private static final int PERSON_AGE_21 = 21;
     private static final int PERSON_AGE_25 = 25;
-    private static final int STATUS_OK = 200;
-    private static final int STATUS_CREATED = 201;
-    private static final int STATUS_NO_CONTENT = 204;
     private static final int INVALID_ID = -1;
-    private static final int STATUS_NOT_FOUND = 404;
+    private final static PersonService personService = mock(PersonService.class);
+    private final ResourceExtension resourceTestRule = setUpResources();
 
-    private final PersonService personService = mock(PersonServiceImpl.class);
+    private String getBaseURL() {
+        return "http://localhost:8080";
+    }
 
-    @InjectMocks
-    private PersonResource personResource;
+    private ResourceExtension setUpResources() {
+        return ResourceExtension.builder().addResource(new PersonResource(personService)).build();
+    }
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    private Client client() {
+        return resourceTestRule.client();
     }
 
     @Test
@@ -46,39 +52,36 @@ class PersonResourceTest {
         // Given
         final var person1 = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
         final var person2 = new PersonDTO(2, PERSON_NAME_BOBBY, PERSON_AGE_25);
-        when(personService.getAllPersons()).thenReturn(Arrays.asList(person1, person2));
+        when(personService.getAllPersons()).thenReturn(List.of(person1, person2));
 
         // When
-        final var response = personResource.getAllPersons();
+        final var response = client().target(getBaseURL()).path("/persons").request(MediaType.APPLICATION_JSON_TYPE).get(Response.class);
 
         // Then
-        assertThat(response.getStatus()).isEqualTo(STATUS_OK);
-        final var responsePersons = (List<PersonDTO>) response.getEntity();
+        assertThat(response.getStatus()).isEqualTo(OK_200);
+        final var responsePersons = response.readEntity(new GenericType<List<PersonDTO>>() {
+        });
         assertThat(responsePersons).hasSize(2);
         assertThat(responsePersons.get(0).getName()).isEqualTo(PERSON_NAME_RAHUL);
         assertThat(responsePersons.get(1).getAge()).isEqualTo(PERSON_AGE_25);
-
-        verify(personService).getAllPersons();
     }
 
     @Test
     @DisplayName("Get person by ID returns correct person")
-    void testGetPersonById() {
+    void testGetPersonById() throws PersonNotFoundException {
         // Given
         final var person = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
         when(personService.getPersonById(1)).thenReturn(person);
 
         // When
-        final var response = personResource.getPersonById(1);
+        final var response = client().target(getBaseURL()).path("/persons/1").request().get();
 
         // Then
-        assertThat(response.getStatus()).isEqualTo(STATUS_OK);
-        final var retrievedPerson = (PersonDTO) response.getEntity();
+        assertThat(response.getStatus()).isEqualTo(OK_200);
+        final var retrievedPerson = response.readEntity(PersonDTO.class);
         assertThat(retrievedPerson).isNotNull();
         assertThat(retrievedPerson.getName()).isEqualTo(PERSON_NAME_RAHUL);
         assertThat(retrievedPerson.getAge()).isEqualTo(PERSON_AGE_21);
-
-        verify(personService).getPersonById(1);
     }
 
     @Test
@@ -89,99 +92,94 @@ class PersonResourceTest {
         when(personService.createPerson(any(PersonDTO.class))).thenReturn(personDTO);
 
         // When
-        final var response = personResource.createPerson(personDTO);
+        final var response = client().target(getBaseURL()).path("/persons").request().post(Entity.json(personDTO));
 
         // Then
-        assertThat(response.getStatus()).isEqualTo(STATUS_CREATED);
-        final var createdPerson = (PersonDTO) response.getEntity();
+        assertThat(response.getStatus()).isEqualTo(CREATED_201);
+        final var createdPerson = response.readEntity(PersonDTO.class);
         assertThat(createdPerson).isNotNull();
         assertThat(createdPerson.getName()).isEqualTo(PERSON_NAME_RAHUL);
         assertThat(createdPerson.getAge()).isEqualTo(PERSON_AGE_21);
-
-        verify(personService).createPerson(any(PersonDTO.class));
     }
 
     @Test
     @DisplayName("Update person successfully")
-    void testUpdatePerson() {
-        // given
+    void testUpdatePerson() throws PersonNotFoundException {
+        // Given
         final var personDTO = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
 
-        //when
-        final var response = personResource.updatePerson(1, personDTO);
+        // When
+        final var response = client().target(getBaseURL()).path("/persons/1").request().put(Entity.json(personDTO));
 
-        //then
-        assertThat(response.getStatus()).isEqualTo(STATUS_OK);
-        verify(personService).updatePerson(1, personDTO);
+        // Then
+        assertThat(response.getStatus()).isEqualTo(OK_200);
     }
 
     @Test
     @DisplayName("Delete person successfully")
-    void testDeletePerson() {
-        // when
-        final var response = personResource.deletePerson(1);
+    void testDeletePerson() throws PersonNotFoundException {
+        // When
+        final var response = client().target(getBaseURL()).path("/persons/1").request().delete();
 
-        //then
-        assertThat(response.getStatus()).isEqualTo(STATUS_NO_CONTENT);
-        verify(personService).deletePerson(1);
+        // Then
+        assertThat(response.getStatus()).isEqualTo(NO_CONTENT_204);
     }
 
-    /*
-        Negative test cases
+    /**
+     * Negative test cases
      */
 
     @Test
     @DisplayName("Get person by invalid ID returns not found")
-    void testGetPersonByInvalidId() {
+    void testGetPersonByInvalidId() throws PersonNotFoundException {
         // Given
-        when(personService.getPersonById(INVALID_ID)).thenReturn(null);
+        when(personService.getPersonById(INVALID_ID)).thenThrow(new PersonNotFoundException("Person not found"));
 
         // When
-        final Response response = personResource.getPersonById(INVALID_ID);
+        final var response = client().target(getBaseURL()).path("/persons/" + INVALID_ID).request().get();
 
         // Then
-        assertThat(response.getStatus()).isEqualTo(STATUS_NOT_FOUND);
-        verify(personService).getPersonById(INVALID_ID);
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND_404);
     }
 
     @Test
     @DisplayName("Create person with null data throws exception")
     void testCreatePersonWithNullData() {
         // Given
-        when(personService.createPerson(null)).thenThrow(new IllegalArgumentException("Person data cannot be null"));
+        when(personService.createPerson(null)).thenThrow(new CustomServiceException(BAD_REQUEST, "Person data for creation cannot be null"));
 
         // When
-        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> personResource.createPerson(null));
+        final var response = client().target(getBaseURL()).path("/persons").request().post(Entity.json(null));
 
         // Then
-        assertThat(exception.getMessage()).isEqualTo("Person data cannot be null");
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST_400);
     }
 
     @Test
     @DisplayName("Update person with invalid ID returns not found")
-    void testUpdatePersonWithInvalidId() {
+    void testUpdatePersonWithInvalidId() throws PersonNotFoundException {
         // Given
         final var personDTO = new PersonDTO(INVALID_ID, PERSON_NAME_RAHUL, PERSON_AGE_21);
-        doThrow(new IllegalArgumentException("Invalid person ID")).when(personService).updatePerson(INVALID_ID, personDTO);
+        doThrow(new PersonNotFoundException("Person not found")).when(personService).updatePerson(eq(INVALID_ID), any());
 
         // When
-        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> personResource.updatePerson(INVALID_ID, personDTO));
+        final var response = client().target(getBaseURL()).path("/persons/" + INVALID_ID).request().put(Entity.json(personDTO));
 
         // Then
-        assertThat(exception.getMessage()).isEqualTo("Invalid person ID");
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND_404);
     }
 
     @Test
     @DisplayName("Delete person with invalid ID returns not found")
-    void testDeletePersonWithInvalidId() {
+    void testDeletePersonWithInvalidId() throws PersonNotFoundException {
         // Given
-        doThrow(new IllegalArgumentException("Invalid person ID")).when(personService).deletePerson(INVALID_ID);
+        doThrow(new PersonNotFoundException("Person not found")).when(personService).deletePerson(100);
 
         // When
-        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> personResource.deletePerson(INVALID_ID));
+        final var response = client().target(getBaseURL()).path("/persons/" + 100).request().delete();
 
         // Then
-        assertThat(exception.getMessage()).isEqualTo("Invalid person ID");
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND_404);
     }
-}
 
+}

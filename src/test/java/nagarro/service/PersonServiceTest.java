@@ -3,6 +3,7 @@ package nagarro.service;
 import nagarro.dao.PersonDAO;
 import nagarro.dto.PersonDTO;
 import nagarro.entity.Person;
+import nagarro.exception.CustomServiceException;
 import nagarro.exception.PersonNotFoundException;
 import nagarro.service.impl.PersonServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +14,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -119,7 +120,7 @@ class PersonServiceTest {
     @DisplayName("Delete person with valid ID")
     void testDeletePerson() {
         // give
-        int idToDelete = 1;
+        final var idToDelete = 1;
         when(personDAO.getPersonById(idToDelete)).thenReturn(Optional.of(new Person(idToDelete, "John", 30)));
 
         // when
@@ -135,7 +136,7 @@ class PersonServiceTest {
     @DisplayName("Get all persons when none exist")
     void testGetAllPersonsWhenNoneExist() {
         // Given
-        when(personDAO.getAllPersons()).thenReturn(List.of());
+        when(personDAO.getAllPersons()).thenReturn(emptyList());
 
         // When
         final var persons = personService.getAllPersons();
@@ -162,7 +163,7 @@ class PersonServiceTest {
         final var invalidPersonDTO = new PersonDTO(0, null, -1);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> personService.createPerson(invalidPersonDTO));
+        assertThrows(CustomServiceException.class, () -> personService.createPerson(invalidPersonDTO));
     }
 
     @Test
@@ -172,7 +173,7 @@ class PersonServiceTest {
         final var invalidPersonDTO = new PersonDTO(PERSON_ID, null, -1);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> personService.updatePerson(PERSON_ID, invalidPersonDTO));
+        assertThrows(CustomServiceException.class, () -> personService.updatePerson(PERSON_ID, invalidPersonDTO));
     }
 
     @Test

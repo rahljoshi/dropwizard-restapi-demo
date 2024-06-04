@@ -1,3 +1,4 @@
+nagarro\exception\mapper\GeneralExceptionMapper.class
 nagarro\health\ApplicationHealthCheck.class
 nagarro\dto\PersonDTO.class
 nagarro\service\PersonService.class
@@ -5,7 +6,6 @@ nagarro\resources\PersonResource.class
 nagarro\DemoConfiguration.class
 nagarro\exception\PersonNotFoundException.class
 nagarro\DemoApplication.class
-nagarro\exception\mapper\PersonNotFoundExceptionMapper.class
 nagarro\dao\mapper\PersonMapper.class
 nagarro\dto\ErrorMessage.class
 nagarro\dao\PersonDAO.class

@@ -2,6 +2,8 @@ package nagarro.dao;
 
 import nagarro.dao.mapper.PersonMapper;
 import nagarro.entity.Person;
+import nagarro.exception.DatabaseOperationException;
+import nagarro.exception.PersonCreationException;
 import nagarro.exception.PersonNotFoundException;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -20,7 +22,7 @@ public interface PersonDAO {
 
     @SqlUpdate("INSERT INTO person (name, age) VALUES (:name, :age)")
     @GetGeneratedKeys
-    int createPerson(@BindBean Person person);
+    int createPerson(@BindBean Person person) throws PersonCreationException;
 
     @SqlQuery("SELECT * FROM person")
     List<Person> getAllPersons();
@@ -29,7 +31,7 @@ public interface PersonDAO {
     Optional<Person> getPersonById(@Bind("id") int id) throws PersonNotFoundException;
 
     @SqlUpdate("UPDATE person SET name = :name, age = :age WHERE id = :id")
-    void updatePerson(@BindBean Person person);
+    void updatePerson(@BindBean Person person) throws PersonNotFoundException, DatabaseOperationException;
 
     @SqlUpdate("DELETE FROM person WHERE id = :id")
     void deletePerson(@Bind("id") int id) throws PersonNotFoundException;

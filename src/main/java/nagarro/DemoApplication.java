@@ -6,7 +6,7 @@ import io.dropwizard.core.setup.Environment;
 import io.dropwizard.jdbi3.JdbiFactory;
 import nagarro.dao.PersonDAO;
 import nagarro.dao.mapper.PersonMapper;
-import nagarro.exception.mapper.PersonNotFoundExceptionMapper;
+import nagarro.exception.mapper.GeneralExceptionMapper;
 import nagarro.resources.PersonResource;
 import nagarro.service.impl.PersonServiceImpl;
 
@@ -21,6 +21,9 @@ public class DemoApplication extends Application<DemoConfiguration> {
         return "Demo";
     }
 
+    /**
+     * @param bootstrap the application bootstrap
+     */
     @Override
     public void initialize(final Bootstrap<DemoConfiguration> bootstrap) {
     }
@@ -34,7 +37,7 @@ public class DemoApplication extends Application<DemoConfiguration> {
         personDAO.createTable();
         final var personService = new PersonServiceImpl(personDAO);
         final var personResource = new PersonResource(personService);
-        environment.jersey().register(new PersonNotFoundExceptionMapper());
+        environment.jersey().register(new GeneralExceptionMapper());
         environment.jersey().register(personResource);
     }
 }

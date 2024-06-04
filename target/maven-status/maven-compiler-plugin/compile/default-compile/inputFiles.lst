@@ -5,7 +5,8 @@ C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\DemoConfiguration.jav
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\dto\ErrorMessage.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\dto\PersonDTO.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\entity\Person.java
-C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\mapper\PersonNotFoundExceptionMapper.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\CustomServiceException.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\mapper\GeneralExceptionMapper.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\PersonNotFoundException.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\health\ApplicationHealthCheck.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\resources\PersonResource.java

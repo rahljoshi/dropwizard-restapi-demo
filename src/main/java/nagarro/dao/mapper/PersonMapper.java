@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class PersonMapper implements RowMapper<Person> {
     @Override
-    public Person map(ResultSet rs, StatementContext ctx) throws SQLException {
+    public Person map(final ResultSet rs, final StatementContext ctx) throws SQLException {
         return new Person(
                 rs.getInt("id"),
                 rs.getString("name"),
