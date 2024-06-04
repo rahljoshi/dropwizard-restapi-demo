@@ -3,7 +3,6 @@ package nagarro.service;
 import nagarro.dao.PersonDAO;
 import nagarro.dto.PersonDTO;
 import nagarro.entity.Person;
-import nagarro.exception.CustomServiceException;
 import nagarro.exception.PersonNotFoundException;
 import nagarro.service.impl.PersonServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,26 +152,6 @@ class PersonServiceTest {
 
         // When & Then
         assertThrows(PersonNotFoundException.class, () -> personService.getPersonById(INVALID_ID));
-    }
-
-    @Test
-    @DisplayName("Create person with invalid data")
-    void testCreatePersonWithInvalidData() {
-        // Given
-        final var invalidPersonDTO = new PersonDTO(0, null, -1);
-
-        // When & Then
-        assertThrows(CustomServiceException.class, () -> personService.createPerson(invalidPersonDTO));
-    }
-
-    @Test
-    @DisplayName("Update person with invalid data")
-    void testUpdatePersonWithInvalidData() {
-        // Given
-        final var invalidPersonDTO = new PersonDTO(PERSON_ID, null, -1);
-
-        // When & Then
-        assertThrows(CustomServiceException.class, () -> personService.updatePerson(PERSON_ID, invalidPersonDTO));
     }
 
     @Test

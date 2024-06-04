@@ -8,6 +8,7 @@ nagarro\exception\PersonNotFoundException.class
 nagarro\DemoApplication.class
 nagarro\dao\mapper\PersonMapper.class
 nagarro\dto\ErrorMessage.class
+nagarro\exception\mapper\ConstraintViolationExceptionMapper.class
 nagarro\dao\PersonDAO.class
 nagarro\entity\Person.class
 nagarro\service\impl\PersonServiceImpl.class

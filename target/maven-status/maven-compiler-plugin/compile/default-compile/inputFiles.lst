@@ -8,6 +8,7 @@ C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\dto\PersonDTO.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\entity\Person.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\CustomServiceException.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\DatabaseOperationException.java
+C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\mapper\ConstraintViolationExceptionMapper.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\mapper\GeneralExceptionMapper.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\PersonCreationException.java
 C:\Users\rahuljoshi02\Documents\demo\src\main\java\nagarro\exception\PersonNotFoundException.java

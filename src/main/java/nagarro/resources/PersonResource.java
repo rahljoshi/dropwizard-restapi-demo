@@ -1,6 +1,7 @@
 package nagarro.resources;
 
 
+import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -42,6 +43,8 @@ public class PersonResource {
             }
             final var createdPerson = personService.createPerson(personDTO);
             return status(CREATED).entity(createdPerson).build();
+        } catch (ConstraintViolationException e) {
+            return status(BAD_REQUEST).entity(new ErrorMessage("Invalid person data: " + e.getMessage())).build();
         } catch (CustomServiceException e) {
             return status(e.getStatus()).entity(new ErrorMessage(e.getMessage())).build();
         } catch (DatabaseOperationException e) {
@@ -57,8 +60,8 @@ public class PersonResource {
             return status(OK).build();
         } catch (PersonNotFoundException e) {
             return status(NOT_FOUND).entity(new ErrorMessage(e.getMessage())).build();
-        } catch (CustomServiceException e) {
-            return status(e.getStatus()).entity(new ErrorMessage(e.getMessage())).build();
+        } catch (ConstraintViolationException e) {
+            return status(BAD_REQUEST).entity(new ErrorMessage("Invalid person data: " + e.getMessage())).build();
         } catch (DatabaseOperationException e) {
             return status(INTERNAL_SERVER_ERROR).entity(new ErrorMessage("An unexpected database error occurred while updating the person.")).build();
         }

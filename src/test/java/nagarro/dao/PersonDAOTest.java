@@ -10,7 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -67,8 +68,8 @@ class PersonDAOTest {
 
         //then
         assertTrue(retrievedPerson.isPresent());
-        assertThat(retrievedPerson.get().getName()).isEqualTo(PERSON_NAME_RAHUL);
-        assertThat(retrievedPerson.get().getAge()).isEqualTo(PERSON_AGE_21);
+        assertThat(retrievedPerson.get().getName(), is(PERSON_NAME_RAHUL));
+        assertThat(retrievedPerson.get().getAge(), is(PERSON_AGE_21));
     }
 
     @Test
@@ -138,4 +139,5 @@ class PersonDAOTest {
         // When/Then
         assertThrows(DatabaseOperationException.class, () -> personDAO.getAllPersons());
     }
+
 }

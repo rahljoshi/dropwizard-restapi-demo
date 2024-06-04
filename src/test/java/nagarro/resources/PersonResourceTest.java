@@ -2,13 +2,13 @@ package nagarro.resources;
 
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import nagarro.dto.PersonDTO;
-import nagarro.exception.CustomServiceException;
 import nagarro.exception.PersonNotFoundException;
 import nagarro.service.PersonService;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Set;
 
-import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.jetty.http.HttpStatus.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -146,9 +146,6 @@ class PersonResourceTest {
     @Test
     @DisplayName("Create person with null data throws exception")
     void testCreatePersonWithNullData() {
-        // Given
-        when(personService.createPerson(null)).thenThrow(new CustomServiceException(BAD_REQUEST, "Person data for creation cannot be null"));
-
         // When
         final var response = client().target(getBaseURL()).path("/persons").request().post(Entity.json(null));
 
@@ -171,6 +168,20 @@ class PersonResourceTest {
     }
 
     @Test
+    @DisplayName("Update person with invalid data returns bad request")
+    void testUpdatePersonWithInvalidData() {
+        // Given
+        final var personDTO = new PersonDTO(1, PERSON_NAME_RAHUL, PERSON_AGE_21);
+        doThrow(new ConstraintViolationException("Person data for update cannot be null", Set.of())).when(personService).updatePerson(eq(1), any());
+
+        // When
+        final var response = client().target(getBaseURL()).path("/persons/" + 1).request().put(Entity.json(personDTO));
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST_400);
+    }
+
+    @Test
     @DisplayName("Delete person with invalid ID returns not found")
     void testDeletePersonWithInvalidId() throws PersonNotFoundException {
         // Given
@@ -187,8 +198,7 @@ class PersonResourceTest {
     @DisplayName("Update person with null data throws bad request")
     void testUpdatePersonWithNullData() {
         // Given
-        doThrow(new CustomServiceException(BAD_REQUEST, "Person data for update cannot be null")).when(personService).updatePerson(eq(1), any());
-
+        doThrow(new ConstraintViolationException("Person data for update cannot be null", Set.of())).when(personService).updatePerson(eq(1), any());
         // When
         final var response = client().target(getBaseURL()).path("/persons/1").request().put(Entity.json(new PersonDTO()));
 

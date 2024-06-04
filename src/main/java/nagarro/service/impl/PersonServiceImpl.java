@@ -24,7 +24,6 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonDTO createPerson(final PersonDTO personDTO) {
         try {
-            personDTO.validateForCreation();
             final var person = new Person(0, personDTO.getName(), personDTO.getAge());
             final var generatedId = personDAO.createPerson(person);
             person.setId(generatedId);
@@ -52,7 +51,6 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public void updatePerson(final int id, final PersonDTO personDTO) throws PersonNotFoundException {
         try {
-            personDTO.validateForUpdate();
             final var existingPerson = personDAO.getPersonById(id);
             if (existingPerson.isPresent()) {
                 final var personToUpdate = existingPerson.get();
